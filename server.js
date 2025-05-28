@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const articleRoutes = require("./routes/articles");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 const PORT = 3000;
@@ -9,6 +10,7 @@ const PORT = 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use("/api/auth", authRoutes);
 
 // Routes
 app.use("/api/articles", articleRoutes);

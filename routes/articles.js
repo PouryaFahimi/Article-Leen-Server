@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Article = require("../models/Article");
+const auth = require("../middleware/auth");
 
 // GET all articles
 router.get("/", async (req, res) => {
@@ -9,7 +10,7 @@ router.get("/", async (req, res) => {
 });
 
 // POST a new article
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   const { title, content } = req.body;
   const newArticle = new Article({ title, content });
   await newArticle.save();
