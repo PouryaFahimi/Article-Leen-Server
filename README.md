@@ -1,5 +1,9 @@
 to connect the mongoDB to server, run this command:
 
-    docker run --rm -it -p 27017:27017 mongo
+    docker-compose up -d
 
 then run the `server.js` with Node.
+
+and to disconnect the database run this one:
+
+    docker-compose down
