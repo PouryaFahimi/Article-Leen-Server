@@ -36,3 +36,11 @@ Thumbs.db
 
 # Optional: if you use TypeScript
 *.tsbuildinfo
+
+# temporary
+/mongo-data/
+
+# /mongo-data/diagnostic.data/
+# /mongo-data/journal/
+# /mongo-data/WiredTiger
+# /mongo-data/WiredTiger.lock
