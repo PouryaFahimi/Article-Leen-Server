@@ -7,12 +7,13 @@ const auth = require("../middleware/auth");
 router.get("/", async (req, res) => {
   const articles = await Article.find();
   res.json(articles);
+  console.log(">> GET Articles");
 });
 
 // POST a new article
 router.post("/", auth, async (req, res) => {
-  const { title, content } = req.body;
-  const newArticle = new Article({ title, content });
+  const { title, content, username } = req.body;
+  const newArticle = new Article({ title, content, username });
   await newArticle.save();
   res.status(201).json(newArticle);
   console.log(">> Incoming POST:", req.body);

@@ -1,6 +1,7 @@
 let temp = {
   title: "first test",
   content: "this is the content of the first test",
+  username: "eg",
 };
 
 function calculateContentLength(jsonBody) {
@@ -9,18 +10,28 @@ function calculateContentLength(jsonBody) {
 }
 
 const contentLength = calculateContentLength(temp);
-console.log(contentLength); // Output: 24
+console.log(contentLength);
 
 const requestOptions = {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
     "Content-Length": contentLength,
+    Authorization: "Bearer token",
   },
   body: JSON.stringify(temp),
 };
 
 fetch("http://localhost:3000/api/articles", requestOptions)
-  .then((res) => res.json())
-  .then((data) => console.log("res data" + data[0]))
-  .catch((err) => console.log(err));
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then((data) => {
+    console.log("Response from server:", data);
+  })
+  .catch((error) => {
+    console.error("Request failed:", error);
+  });

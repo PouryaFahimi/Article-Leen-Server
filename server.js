@@ -19,7 +19,7 @@ app.use("/api/articles", articleRoutes);
 mongoose
   .connect("mongodb://localhost:27017/articleDB")
   .then(() => {
-    console.log("✅ MongoDB connected");
+    console.log("$$ MongoDB connected");
     app.listen(PORT, () =>
       console.log(`$$ Server running on http://localhost:${PORT}`)
     );
