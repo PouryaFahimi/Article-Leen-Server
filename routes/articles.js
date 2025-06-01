@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Article = require("../models/Article");
+const User = require("../models/User");
 const auth = require("../middleware/auth");
 const jwt = require("jsonwebtoken");
 
@@ -9,6 +10,19 @@ router.get("/", async (req, res) => {
   const articles = await Article.find();
   res.json(articles);
   console.log(">> GET Articles");
+});
+
+// GET all articles of one user
+router.get("/user/:username", async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const articles = await Article.find({ username: user.username });
+    res.json(articles);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // POST a new article
