@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Article = require("../models/Article");
 const auth = require("../middleware/auth");
+const jwt = require("jsonwebtoken");
 
 // GET all articles
 router.get("/", async (req, res) => {
@@ -12,7 +13,10 @@ router.get("/", async (req, res) => {
 
 // POST a new article
 router.post("/", auth, async (req, res) => {
-  const { title, content, username } = req.body;
+  const { title, content } = req.body;
+  const token = req.headers.authorization?.split(" ")[1]; // Bearer <token>
+  const decoded = jwt.decode(token);
+  const username = decoded.username;
   const newArticle = new Article({ title, content, username });
   await newArticle.save();
   res.status(201).json(newArticle);
