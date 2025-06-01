@@ -35,9 +35,15 @@ router.get("/search", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   // update an article by Id
   try {
+    const prev = await Article.findById(req.params.id);
+    const token = req.headers.authorization?.split(" ")[1]; // Bearer <token>
+    const decoded = jwt.decode(token);
+    const username = decoded.username;
+    if (username !== prev.username)
+      return res.status(400).json({ error: "Invalid credentials" });
     const updated = await Article.findByIdAndUpdate(
       req.params.id,
       { title: req.body.title, content: req.body.content },
