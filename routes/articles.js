@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 
 // GET all articles
 router.get("/", async (req, res) => {
-  const articles = await Article.find();
+  const articles = await Article.find().select("-__v");
   res.json(articles);
   console.log(">> GET Articles");
 });
@@ -18,7 +18,9 @@ router.get("/user/:username", async (req, res) => {
     const user = await User.findOne({ username: req.params.username });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    const articles = await Article.find({ username: user.username });
+    const articles = await Article.find({ username: user.username }).select(
+      "-__v"
+    );
     res.json(articles);
   } catch (err) {
     res.status(500).json({ error: "Server error" });
