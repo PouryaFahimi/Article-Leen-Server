@@ -12,6 +12,17 @@ router.get("/", async (req, res) => {
   console.log(">> GET Articles");
 });
 
+// GET one article by Id
+router.get("/:articleId", async (req, res) => {
+  try {
+    const article = await Article.findById(req.params.articleId).select("-__v");
+    if (!article) return res.status(404).json({ error: "Article not found" });
+    res.json(article);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // GET all articles of one user
 router.get("/user/:username", async (req, res) => {
   try {
