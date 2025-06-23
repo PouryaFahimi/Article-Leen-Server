@@ -18,7 +18,11 @@ router.post("/register", async (req, res) => {
     const user = new User({ username, password: hashedPassword });
     await user.save();
 
-    res.status(201).json({ message: "User registered" });
+    const token = jwt.sign({ username: user.username }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.status(201).json({ message: "User registered", token: token });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
