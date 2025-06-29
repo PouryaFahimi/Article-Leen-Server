@@ -36,8 +36,13 @@ router.delete("/:articleId", auth, async (req, res) => {
 router.get("/user", auth, async (req, res) => {
   try {
     const likes = await Like.find({ userId: req.user }).populate("articleId");
-    const likedArticles = likes.map((like) => like.articleId);
-    res.json({ likedArticles });
+    console.log(likes[0]);
+    const likedArticles = likes.map((like) => {
+      const article = like.articleId.toObject();
+      article.isLiked = true;
+      return article;
+    });
+    res.json(likedArticles);
   } catch (err) {
     res
       .status(500)
