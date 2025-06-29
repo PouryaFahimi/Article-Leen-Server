@@ -4,6 +4,7 @@ const cors = require("cors");
 const articleRoutes = require("./routes/articles");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
+const likesRoutes = require("./routes/likes");
 
 const app = express();
 const PORT = 3000;
@@ -16,6 +17,7 @@ app.use("/api/auth", authRoutes);
 // Routes
 app.use("/api/articles", articleRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/likes", likesRoutes);
 
 // DB Connection
 mongoose
