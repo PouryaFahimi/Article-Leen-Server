@@ -5,6 +5,7 @@ const articleRoutes = require("./routes/articles");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const likesRoutes = require("./routes/likes");
+const bookmarksRoutes = require("./routes/bookmarks");
 
 const app = express();
 const PORT = 3000;
@@ -18,6 +19,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/articles", articleRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/likes", likesRoutes);
+app.use("/api/bookmarks", bookmarksRoutes);
 
 // DB Connection
 mongoose
