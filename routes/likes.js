@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Like = require("../models/Like");
 const auth = require("../middleware/auth");
+const { addFlagsToArticles } = require("../utils/articleFlags");
 
 // Like an article
 router.post("/:articleId", auth, async (req, res) => {
@@ -36,13 +37,11 @@ router.delete("/:articleId", auth, async (req, res) => {
 router.get("/user", auth, async (req, res) => {
   try {
     const likes = await Like.find({ userId: req.user }).populate("articleId");
-    console.log(likes[0]);
-    const likedArticles = likes.map((like) => {
-      const article = like.articleId.toObject();
-      article.isLiked = true;
-      return article;
-    });
-    res.json(likedArticles);
+    const likedArticles = likes.map((like) => like.articleId);
+
+    const articlesWithFlags = await addFlagsToArticles(likedArticles, req.user);
+
+    res.json(articlesWithFlags);
   } catch (err) {
     res
       .status(500)

@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const Bookmark = require("../models/Bookmark");
 const auth = require("../middleware/auth");
+const { addFlagsToArticles } = require("../utils/articleFlags");
 
 // Bookmark an article
 router.post("/:articleId", auth, async (req, res) => {
@@ -51,9 +52,14 @@ router.get("/", auth, async (req, res) => {
     const bookmarks = await Bookmark.find({ userId: req.user }).populate(
       "articleId"
     );
-
     const bookmarkedArticles = bookmarks.map((bookmark) => bookmark.articleId);
-    res.json(bookmarkedArticles);
+
+    const articlesWithFlags = await addFlagsToArticles(
+      bookmarkedArticles,
+      req.user
+    );
+
+    res.json(articlesWithFlags);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch bookmarks" });

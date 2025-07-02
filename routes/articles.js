@@ -5,28 +5,17 @@ const User = require("../models/User");
 const Like = require("../models/Like");
 const auth = require("../middleware/auth");
 const jwt = require("jsonwebtoken");
+const { addFlagsToArticles } = require("../utils/articleFlags");
 
 // GET all articles
 router.get("/", auth, async (req, res) => {
   try {
     const userId = req.user;
-
     const articles = await Article.find().select("-__v");
 
-    const likes = await Like.find({ userId }).select("articleId");
-    const likedArticleIds = new Set(
-      likes.map((like) => like.articleId.toString())
-    );
+    const articlesWithFlags = await addFlagsToArticles(articles, userId);
 
-    const articlesWithIsLiked = articles.map((article) => {
-      const isLiked = likedArticleIds.has(article._id.toString());
-      return {
-        ...article.toObject(),
-        isLiked,
-      };
-    });
-
-    res.json(articlesWithIsLiked);
+    res.json(articlesWithFlags);
     console.log(">> GET Articles");
   } catch (err) {
     res.status(500).json({ message: "Failed to get articles", error: err });
@@ -39,11 +28,10 @@ router.get("/:articleId", auth, async (req, res) => {
     const userId = req.user;
     const article = await Article.findById(req.params.articleId).select("-__v");
     if (!article) return res.status(404).json({ error: "Article not found" });
-    const liked = await Like.exists({
-      userId,
-      articleId: req.params.articleId,
-    });
-    res.json({ ...article.toObject(), isLiked: !!liked });
+
+    const articlesWithFlags = await addFlagsToArticles(article, userId);
+
+    res.json(articlesWithFlags);
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
@@ -61,17 +49,9 @@ router.get("/user/:username", auth, async (req, res) => {
       "-__v"
     );
 
-    const articlesWithIsLiked = await Promise.all(
-      articles.map(async (article) => {
-        const liked = await Like.exists({ userId, articleId: article._id });
-        return {
-          ...article.toObject(),
-          isLiked: !!liked,
-        };
-      })
-    );
+    const articlesWithFlags = await addFlagsToArticles(articles, userId);
 
-    res.json(articlesWithIsLiked);
+    res.json(articlesWithFlags);
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
@@ -89,13 +69,16 @@ router.post("/", auth, async (req, res) => {
   console.log(">> Incoming POST:", req.body);
 });
 
-router.get("/search", async (req, res) => {
+router.get("/search", auth, async (req, res) => {
   const query = req.query.q;
   try {
     const results = await Article.find({
       title: { $regex: query, $options: "i" }, // case-insensitive search
     });
-    res.json(results);
+
+    const articlesWithFlags = await addFlagsToArticles(results, req.user);
+
+    res.json(articlesWithFlags);
   } catch (err) {
     res.status(500).json({ error: "Search error" });
   }
