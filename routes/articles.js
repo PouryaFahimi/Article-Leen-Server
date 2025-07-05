@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Article = require("../models/Article");
 const User = require("../models/User");
-const Like = require("../models/Like");
 const auth = require("../middleware/auth");
 const jwt = require("jsonwebtoken");
 const { addFlagsToArticles } = require("../utils/articleFlags");
@@ -19,6 +18,26 @@ router.get("/", auth, async (req, res) => {
     console.log(">> GET Articles");
   } catch (err) {
     res.status(500).json({ message: "Failed to get articles", error: err });
+  }
+});
+
+// GET searched articles
+router.get("/search", auth, async (req, res) => {
+  const query = req.query.q;
+  try {
+    const results = await Article.find({
+      $or: [
+        { title: { $regex: query, $options: "i" } },
+        { content: { $regex: query, $options: "i" } },
+      ],
+    });
+
+    const articlesWithFlags = await addFlagsToArticles(results, req.user);
+
+    res.json(articlesWithFlags);
+    console.log(">> Searched for: " + query);
+  } catch (err) {
+    res.status(500).json({ error: "Search error" });
   }
 });
 
@@ -67,21 +86,6 @@ router.post("/", auth, async (req, res) => {
   await newArticle.save();
   res.status(201).json(newArticle);
   console.log(">> Incoming POST:", req.body);
-});
-
-router.get("/search", auth, async (req, res) => {
-  const query = req.query.q;
-  try {
-    const results = await Article.find({
-      title: { $regex: query, $options: "i" }, // case-insensitive search
-    });
-
-    const articlesWithFlags = await addFlagsToArticles(results, req.user);
-
-    res.json(articlesWithFlags);
-  } catch (err) {
-    res.status(500).json({ error: "Search error" });
-  }
 });
 
 // update an article by Id
