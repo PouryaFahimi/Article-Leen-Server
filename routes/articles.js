@@ -10,7 +10,7 @@ const { addFlagsToArticles } = require("../utils/articleFlags");
 router.get("/", auth, async (req, res) => {
   try {
     const userId = req.user;
-    const articles = await Article.find().select("-__v");
+    const articles = await Article.find().select("-userId -__v");
 
     const articlesWithFlags = await addFlagsToArticles(articles, userId);
 
@@ -82,7 +82,8 @@ router.post("/", auth, async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1]; // Bearer <token>
   const decoded = jwt.decode(token);
   const username = decoded.username;
-  const newArticle = new Article({ title, content, username });
+  const userId = req.user;
+  const newArticle = new Article({ title, content, username, userId });
   await newArticle.save();
   res.status(201).json(newArticle);
   console.log(">> Incoming POST:", req.body);
@@ -105,6 +106,19 @@ router.put("/:id", auth, async (req, res) => {
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: "Update error" });
+  }
+});
+
+// DELETE an article by Id
+router.delete("/:articleId", auth, async (req, res) => {
+  const { articleId } = req.params;
+  const userId = req.user;
+
+  try {
+    await Article.findOneAndDelete({ _id: articleId, userId });
+    res.status(200).json({ message: "Article deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to delete article", error: err });
   }
 });
 
