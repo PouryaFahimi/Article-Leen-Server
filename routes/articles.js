@@ -37,7 +37,7 @@ router.get("/search", auth, async (req, res) => {
     const articlesWithFlags = await addFlagsToArticles(results, req.user);
 
     res.json(articlesWithFlags);
-    console.log(">> Searched for: " + query);
+    console.log(">> Searched for article: " + query);
   } catch (err) {
     res.status(500).json({ error: "Search error" });
   }
