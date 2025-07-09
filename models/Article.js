@@ -6,6 +6,7 @@ const articleSchema = new mongoose.Schema(
     content: { type: String, required: true },
     username: { type: String, required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    tags: { type: [String] },
   },
   { timestamps: true }
 );

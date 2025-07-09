@@ -78,12 +78,12 @@ router.get("/user/:username", auth, async (req, res) => {
 
 // POST a new article
 router.post("/", auth, async (req, res) => {
-  const { title, content } = req.body;
+  const { title, content, tags } = req.body;
   const token = req.headers.authorization?.split(" ")[1]; // Bearer <token>
   const decoded = jwt.decode(token);
   const username = decoded.username;
   const userId = req.user;
-  const newArticle = new Article({ title, content, username, userId });
+  const newArticle = new Article({ title, content, username, userId, tags });
   await newArticle.save();
   res.status(201).json(newArticle);
   console.log(">> Incoming POST:", req.body);
@@ -100,7 +100,7 @@ router.put("/:id", auth, async (req, res) => {
       return res.status(400).json({ error: "Invalid credentials" });
     const updated = await Article.findByIdAndUpdate(
       req.params.id,
-      { title: req.body.title, content: req.body.content },
+      { title: req.body.title, content: req.body.content, tags: req.body.tags },
       { new: true }
     );
     res.json(updated);
