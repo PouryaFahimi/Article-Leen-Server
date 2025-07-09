@@ -49,7 +49,7 @@ router.delete("/:articleId", auth, async (req, res) => {
 // Get all bookmarks of current user
 router.get("/", auth, async (req, res) => {
   try {
-    const bookmarks = await Bookmark.find({ userId: req.user }).populate(
+    const bookmarks = await Bookmark.find({ userId: req.user }).sort({ createdAt: -1 }).populate(
       "articleId"
     );
     const bookmarkedArticles = bookmarks.map((bookmark) => bookmark.articleId);

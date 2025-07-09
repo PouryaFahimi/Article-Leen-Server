@@ -36,7 +36,7 @@ router.delete("/:articleId", auth, async (req, res) => {
 // GET all liked articles of current user
 router.get("/user", auth, async (req, res) => {
   try {
-    const likes = await Like.find({ userId: req.user }).populate("articleId");
+    const likes = await Like.find({ userId: req.user }).sort({ createdAt: -1 }).populate("articleId");
     const likedArticles = likes.map((like) => like.articleId);
 
     const articlesWithFlags = await addFlagsToArticles(likedArticles, req.user);

@@ -10,7 +10,9 @@ const { addFlagsToArticles } = require("../utils/articleFlags");
 router.get("/", auth, async (req, res) => {
   try {
     const userId = req.user;
-    const articles = await Article.find().select("-userId -__v");
+    const articles = await Article.find()
+      .sort({ createdAt: -1 })
+      .select("-userId -__v");
 
     const articlesWithFlags = await addFlagsToArticles(articles, userId);
 
@@ -30,7 +32,7 @@ router.get("/search", auth, async (req, res) => {
         { title: { $regex: query, $options: "i" } },
         { content: { $regex: query, $options: "i" } },
       ],
-    });
+    }).sort({ createdAt: -1 });
 
     const articlesWithFlags = await addFlagsToArticles(results, req.user);
 
@@ -64,9 +66,9 @@ router.get("/user/:username", auth, async (req, res) => {
     const user = await User.findOne({ username: req.params.username });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    const articles = await Article.find({ username: user.username }).select(
-      "-__v"
-    );
+    const articles = await Article.find({ username: user.username })
+      .sort({ createdAt: -1 })
+      .select("-__v");
 
     const articlesWithFlags = await addFlagsToArticles(articles, userId);
 
