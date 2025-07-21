@@ -17,6 +17,7 @@ router.post("/:articleId", auth, async (req, res) => {
 
     await bookmark.save();
     res.status(201).json({ message: "Bookmarked successfully!" });
+    console.log("++ POST Bookmark:", bookmark);
   } catch (err) {
     if (err.code === 11000) {
       res.status(400).json({ error: "Article already bookmarked" });
@@ -40,6 +41,7 @@ router.delete("/:articleId", auth, async (req, res) => {
     }
 
     res.json({ message: "Bookmark removed" });
+    console.log("-- DELETE Bookmark:", result);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to remove bookmark" });
@@ -49,9 +51,9 @@ router.delete("/:articleId", auth, async (req, res) => {
 // Get all bookmarks of current user
 router.get("/", auth, async (req, res) => {
   try {
-    const bookmarks = await Bookmark.find({ userId: req.user }).sort({ createdAt: -1 }).populate(
-      "articleId"
-    );
+    const bookmarks = await Bookmark.find({ userId: req.user })
+      .sort({ createdAt: -1 })
+      .populate("articleId");
     const bookmarkedArticles = bookmarks.map((bookmark) => bookmark.articleId);
 
     const articlesWithFlags = await addFlagsToArticles(
@@ -60,6 +62,7 @@ router.get("/", auth, async (req, res) => {
     );
 
     res.json(articlesWithFlags);
+    console.log(">> GET all Bookmarks of username:", req.username);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch bookmarks" });

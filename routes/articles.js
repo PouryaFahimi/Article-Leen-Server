@@ -17,7 +17,7 @@ router.get("/", auth, async (req, res) => {
     const articlesWithFlags = await addFlagsToArticles(articles, userId);
 
     res.json(articlesWithFlags);
-    console.log(">> GET Articles");
+    console.log(">> GET all Articles");
   } catch (err) {
     res.status(500).json({ message: "Failed to get articles", error: err });
   }
@@ -37,7 +37,7 @@ router.get("/search", auth, async (req, res) => {
     const articlesWithFlags = await addFlagsToArticles(results, req.user);
 
     res.json(articlesWithFlags);
-    console.log(">> Searched for article: " + query);
+    console.log("?? Searched for Articles:", query);
   } catch (err) {
     res.status(500).json({ error: "Search error" });
   }
@@ -53,6 +53,7 @@ router.get("/:articleId", auth, async (req, res) => {
     const articlesWithFlags = await addFlagsToArticles(article, userId);
 
     res.json(articlesWithFlags);
+    console.log(">> GET one Article id:", req.params.articleId);
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
@@ -73,6 +74,7 @@ router.get("/user/:username", auth, async (req, res) => {
     const articlesWithFlags = await addFlagsToArticles(articles, userId);
 
     res.json(articlesWithFlags);
+    console.log(">> GET all Articles of user:", req.params.username);
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
@@ -88,7 +90,7 @@ router.post("/", auth, async (req, res) => {
   const newArticle = new Article({ title, content, username, userId, tags });
   await newArticle.save();
   res.status(201).json(newArticle);
-  console.log(">> Incoming POST:", req.body);
+  console.log("++ Incoming POST:", newArticle);
 });
 
 // update an article by Id
@@ -106,6 +108,7 @@ router.put("/:id", auth, async (req, res) => {
       { new: true }
     );
     res.json(updated);
+    console.log(">> Incoming PUT:", updated);
   } catch (err) {
     res.status(500).json({ error: "Update error" });
   }
@@ -119,6 +122,7 @@ router.delete("/:articleId", auth, async (req, res) => {
   try {
     await Article.findOneAndDelete({ _id: articleId, userId });
     res.status(200).json({ message: "Article deleted" });
+    console.log("-- DELETE one Article id:", req.params.articleId);
   } catch (err) {
     res.status(500).json({ message: "Failed to delete article", error: err });
   }

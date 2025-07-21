@@ -12,7 +12,7 @@ router.get("/search", async (req, res) => {
       .select("-password -__v");
 
     res.json(results);
-    console.log(">> Searched for user: " + query);
+    console.log("?? Searched for Users:", query);
   } catch (err) {
     res.status(500).json({ error: "Search error" });
   }
@@ -25,6 +25,7 @@ router.get("/:username", async (req, res) => {
     );
     if (!user) return res.status(404).json({ error: "User not found" });
     res.json(user);
+    console.log(">> GET one User username:", req.params.username);
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
